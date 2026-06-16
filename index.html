@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Установка Kaspersky Internet Security</title>
+    <style>
+        /* Стиль для серьезного установщика Касперского */
+        #installer-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 550px;
+            height: 380px;
+            background-color: #ffffff;
+            border: 1px solid #006d5b;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #333333;
+            display: flex;
+            flex-direction: column;
+            z-index: 999999;
+        }
+
+        .inst-header {
+            background-color: #006d5b; /* Фирменный зеленый Касперского */
+            color: #ffffff;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .inst-body {
+            flex-grow: 1;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .inst-title {
+            font-size: 18px;
+            color: #006d5b;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: #00a88f;
+            transition: width 0.1s linear;
+        }
+
+        .inst-footer {
+            background-color: #f5f5f5;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .inst-btn {
+            padding: 6px 18px;
+            border: 1px solid #adadad;
+            background-color: #e1e1e1;
+            cursor: pointer;
+            font-size: 12px;
+            border-radius: 3px;
+        }
+
+        .inst-btn-active {
+            background-color: #00a88f;
+            color: white;
+            border: none;
+            font-weight: bold;
+        }
+
+        .inst-btn-active:hover {
+            background-color: #008772;
+        }
+
+        /* ----------------------------------------------------------------- */
+        /* ТРЕШОВЫЕ СТИЛИ (активируются после сбоя установки) */
+        /* ----------------------------------------------------------------- */
+        @keyframes bgMadness {
+            0% { background-color: #ff0000; filter: hue-rotate(0deg); }
+            50% { background-color: #00ff00; }
+            100% { background-color: #0000ff; filter: hue-rotate(360deg); }
+        }
+        @keyframes spin {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.8) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+
+        body.virus-mode {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            animation: bgMadness 0.05s infinite linear !important;
+            font-family: "Impact", "Comic Sans MS", sans-serif;
+        }
+
+        .screamer-title {
+            position: fixed;
+            top: 15%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 70px;
+            color: #f0f;
+            text-shadow: 0 0 20px #fff, 0 0 40px #ff00ff, 0 0 80px #00ffff;
+            z-index: 10000;
+            text-align: center;
+            width: 100%;
+            pointer-events: none;
+            animation: textRage 0.05s infinite alternate;
+            display: none;
+        }
+
+        .floating-trash {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            z-index: 999;
+            pointer-events: none;
+            animation: spin 0.8s infinite linear;
+        }
+
+        .mega-popup {
+            position: fixed;
+            width: 290px;
+            background: #ece9d8;
+            border: 4px solid #ff0055;
+            box-shadow: 10px 10px 0px #000;
+            z-index: 99999;
+            font-family: 'Tahoma', sans-serif;
+            font-size: 14px;
+            animation: popupShake 0.08s infinite;
+        }
+
+        .popup-header-danger {
+            background: linear-gradient(180deg, #ff0000, #990000);
+            color: #fff;
+            padding: 5px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        @keyframes textRage {
+            0% { transform: translate(-50%, -50%) skewX(-15deg) scale(0.9); }
+            100% { transform: translate(-50%, -50%) skewX(15deg) scale(1.2); }
+        }
+
+        @keyframes popupShake {
+            0% { transform: translate(4px, 4px) rotate(1deg); }
+            50% { transform: translate(-4px, -4px) rotate(-1deg); }
+            100% { transform: translate(3px, -3px) rotate(0deg); }
+        }
+
+        marquee.virus-marquee {
+            display: none;
+            position: fixed;
+            z-index: 100000;
+            font-size: 30px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ОКНО УСТАНОВЩИКА КАСПЕРСКОГО -->
+    <div id="installer-container">
+        <div class="inst-header">
+            <span>Установка Kaspersky Internet Security</span>
+            <span style="cursor: pointer;" onclick="alert('Установка не может быть отменена на данном этапе!')">✕</span>
+        </div>
+        
+        <!-- Шаг 1: Приветствие -->
+        <div class="inst-body" id="step-1">
+            <div>
+                <div class="inst-title">Вас приветствует мастер установки Kaspersky!</div>
+                <p style="font-size: 13px; line-height: 1.5; color: #555;">
+                    Программа установит на ваш компьютер надежную защиту от вирусов, троянов, багов, Сани.exe и Бабушки Валюши. 
+                    <br><br>
+                    Перед началом установки рекомендуется закрыть все другие приложения (особенно Говно-Кликер).
+                </p>
+            </div>
+            <div style="font-size: 11px; color: #888;">Нажимая «Установить», вы соглашаетесь продать душу за чистый ПК.</div>
+        </div>
+
+        <!-- Шаг 2: Процесс установки (скрыт изначально) -->
+        <div class="inst-body" id="step-2" style="display: none;">
+            <div>
+                <div class="inst-title" id="install-status">Подготовка файлов к установке...</div>
+                <p style="font-size: 12px; color: #666;" id="install-substatus">Копирование компонентов ядра KIS_2024...</p>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="p-bar"></div>
+                </div>
+            </div>
+            <div style="font-size: 11px; color: #990000; font-weight: bold;" id="warning-text">Не выключайте компьютер!</div>
+        </div>
+
+        <!-- Кнопки управления -->
+        <div class="inst-footer" id="inst-footer">
+            <button class="inst-btn" onclick="alert('Назад дороги нет, бро!')">Назад</button>
+            <button class="inst-btn inst-btn-active" id="main-action-btn" onclick="startInstallation()">Установить</button>
+            <button class="inst-btn" onclick="window.close()">Отмена</button>
+        </div>
+    </div>
+
+    <!-- ТРЕШ-КОНТЕНТ (СКРЫТ ДО СБОЯ) -->
+    <div class="screamer-title" id="screamer">САНЯ.EXE ПОБЕДИЛ КАСПЕРСКОГО!!!</div>
+
+    <marquee class="virus-marquee" id="marquee-1" style="top: 0; background: red; color: #fff;">⚠️ КАСПЕРСКИЙ СДОХ! ⚠️ БАБУШКА ВАЛЮША НА СВЯЗИ! ⚠️ КУПИ СОДУ СУКА! ⚠️</marquee>
+    <marquee class="virus-marquee" id="marquee-2" direction="right" style="bottom: 0; background: yellow; color: #000;"> ХУУУУУУУУУУУУУУУУУУЙ!  		ГОВНО КЛИКЕР АКТИВИРОВАН!  			РИБА ХОЧЕТ ЕСТЬ! 🐟</marquee>
+
+
+    <script>
+        let progress = 0;
+        let installInterval;
+
+        // 1. НАЧАЛО УСТАНОВКИ
+        function startInstallation() {
+            // Переключаем шаги
+            document.getElementById('step-1').style.display = 'none';
+            document.getElementById('step-2').style.display = 'block';
+            
+            // Отключаем кнопки в футере
+            const footer = document.getElementById('inst-footer');
+            footer.style.opacity = '0.5';
+            footer.style.pointerEvents = 'none';
+
+            const progressBar = document.getElementById('p-bar');
+            const statusText = document.getElementById('install-status');
+            const substatusText = document.getElementById('install-substatus');
+
+            // Запускаем шкалу
+            installInterval = setInterval(() => {
+                progress += 1;
+                progressBar.style.width = progress + '%';
+
+                if (progress === 15) {
+                    statusText.innerText = "Анализ системы на наличие угроз...";
+                    substatusText.innerText = "Поиск шишка.html и говно_кликер.exe...";
+                }
+                if (progress === 40) {
+                    statusText.innerText = "Удаление вредоносных программ...";
+                    substatusText.innerText = "Попытка заблокировать Бабушку Валюшу...";
+                }
+                if (progress === 70) {
+                    statusText.innerText = "Регистрация библиотек безопасности...";
+                    substatusText.innerText = "Установка драйвера sanya_helper.sys...";
+                    document.getElementById('warning-text').innerText = "ВНИМАНИЕ: Обнаружена критическая активность!";
+                }
+                if (progress === 95) {
+                    clearInterval(installInterval);
+                    triggerSystemCrash(); // На 95% запускаем ПИЗДЕЦ
+                }
+            }, 80); // Скорость заполнения шкалы
+        }
+
+        // 2. МОМЕНТ СБОЯ И ПЕРЕХОД В АД
+        function triggerSystemCrash() {
+            const statusText = document.getElementById('install-status');
+            const substatusText = document.getElementById('install-substatus');
+            
+            statusText.style.color = "red";
+            statusText.innerText = "ОШИБКА БЕЗОПАСНОСТИ! ОБНАРУЖЕН ВИРУС!";
+            substatusText.innerText = "Попытка изолировать ЕБЛАН.PNG... ОТКАЗАНО В ДОСТУПЕ!";
+            
+            playBeep(120); // Предупреждающий писк
+
+            setTimeout(() => {
+                // Удаляем установщик к чертям собачьим
+                document.getElementById('installer-container').remove();
+                
+                // Врубаем режим апокалипсиса
+                document.body.classList.add('virus-mode');
+                document.getElementById('screamer').style.display = 'block';
+                document.getElementById('marquee-1').style.display = 'block';
+                document.getElementById('marquee-2').style.display = 'block';
+                
+                // Запускаем бесконечный спавн
+                startVirusHell();
+            }, 1500); // Секунда задержки для испуга
+        }
+
+        // 3. ТОТАЛЬНЫЙ ВИРУСНЫЙ АД
+        const trashImgs = ['💩', '🍆', '🤡', '👽', '💀', '💦', '💥', '⚠️'];
+
+        function startVirusHell() {
+            // Спавним летающее говно
+            for (let i = 0; i < 5; i++) {
+                spawnMovingTrash();
+            }
+
+            // Бесконечный автоспавн ошибок каждые 300мс
+            setInterval(() => {
+                const popup = document.createElement('div');
+                popup.className = 'mega-popup';
+                popup.style.left = Math.random() * (window.innerWidth - 290) + 'px';
+                popup.style.top = Math.random() * (window.innerHeight - 150) + 'px';
+
+                const texts = [
+                    "KASPER.EXE СЪЕДЕН БАБУШКОЙ ВАЛЮШЕЙ!",
+                    "САНЯ.ЕХЕ УДАЛИЛ ТВОЮ СИСТЕМНУЮ ПАПКУ!",
+                    "ОБНАРУЖЕН СВЕРХРАЗУМНЫЙ ЕБЛАН!",
+                    "МАТРИЦА СЛОМАЛАСЬ!!!",
+                    "ЕБЛАН.PNG ВЫРУБАЙТЕ НАХУЙ!",
+                    "РИБА ХОЧЕТ ЕСТЬ! ПОКОРМИ!"
+                ];
+
+                popup.innerHTML = `
+                    <div class="popup-header-danger">
+                        <span>☢️ KASPERSKY CRASHED ☢️</span>
+                        <span style="cursor:pointer;" onclick="multiply(this)">[X]</span>
+                    </div>
+                    <div style="padding:15px; background:yellow; color:black; text-align:center; font-weight:bold;">
+                        ${texts[Math.floor(Math.random() * texts.length)]}
+                        <br>
+                        <button style="background:red; color:white; font-weight:bold; margin-top:10px; cursor:pointer;" onclick="multiply(this)">ПРИНЯТЬ СМЕРТЬ</button>
+                    </div>
+                `;
+                document.body.appendChild(popup);
+                playBeep(800 + Math.random() * 800);
+            }, 300);
+        }
+
+        // Клонирование при закрытии
+        function multiply(btn) {
+            btn.closest('.mega-popup').remove();
+            for(let i = 0; i < 3; i++) {
+                triggerSinglePopup();
+            }
+        }
+
+        function triggerSinglePopup() {
+            const popup = document.createElement('div');
+            popup.className = 'mega-popup';
+            popup.style.left = Math.random() * (window.innerWidth - 290) + 'px';
+            popup.style.top = Math.random() * (window.innerHeight - 150) + 'px';
+            popup.innerHTML = `
+                <div class="popup-header-danger">
+                    <span>💥 КУДА НАЖАЛ, ЛОШАРА? 💥</span>
+                </div>
+                <div style="padding:15px; background:#000; color:#0f0; text-align:center; font-weight:bold;">
+                    ШЛЁМ ВСЕХ НАХУЙ...
+                </div>
+            `;
+            document.body.appendChild(popup);
+            playScreamerSound();
+            spawnMovingTrash();
+        }
+
+        // Движение мусора по экрану
+        function spawnMovingTrash() {
+            const emoji = document.createElement('div');
+            emoji.className = 'floating-trash';
+            emoji.style.left = Math.random() * 90 + 'vw';
+            emoji.style.top = Math.random() * 90 + 'vh';
+            emoji.style.fontSize = Math.random() * 80 + 60 + 'px';
+            emoji.innerText = trashImgs[Math.floor(Math.random() * trashImgs.length)];
+            document.body.appendChild(emoji);
+
+            let posX = parseFloat(emoji.style.left);
+            let posY = parseFloat(emoji.style.top);
+            let dx = (Math.random() - 0.5) * 25;
+            let dy = (Math.random() - 0.5) * 25;
+
+            function move() {
+                posX += dx;
+                posY += dy;
+                if (posX < 0 || posX > window.innerWidth) dx = -dx;
+                if (posY < 0 || posY > window.innerHeight) dy = -dy;
+                emoji.style.left = posX + 'px';
+                emoji.style.top = posY + 'px';
+                requestAnimationFrame(move);
+            }
+            move();
+        }
+
+        // Звуки
+        function playBeep(freq) {
+            const context = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = context.createOscillator();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(freq, context.currentTime);
+            osc.connect(context.destination);
+            osc.start();
+            osc.stop(context.currentTime + 0.08);
+        }
+
+        function playScreamerSound() {
+            const context = new (window.AudioContext || window.webkitAudioContext)();
+            const osc= context.createOscillator();
+            const gain = context.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(60 + Math.random() * 40, context.currentTime); // Дикий гул
+            gain.gain.setValueAtTime(2, context.currentTime); // ОЧЕНЬ ГРОМКО
+            osc.connect(gain);
+            gain.connect(context.destination);
+            osc.start();
+            osc.stop(context.currentTime + 0.25);
+        }
+    </script>
+</body>
+</html>
